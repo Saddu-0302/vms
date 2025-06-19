@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './App.css'
 import UserManagment from './components/UserManagment'
 import Dashboard from './components/Dashboard'
+import CreateVisitor from './components/CreateVisitor'
 
 function App() {
 
@@ -9,6 +10,7 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
+          <Route path='/create-visitor' element={<CreateVisitor />} />
           <Route path='/' element={<Dashboard />} />
           <Route path='/admin' element={<UserManagment />} />
           <Route path='*' element={<h1>Page Not Found</h1>} />

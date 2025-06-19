@@ -13,6 +13,7 @@ export const visitorApi = createApi({
                         method: "GET"
                     }
                 },
+                transformResponse: data => data.result,
                 providesTags: ["visitor"]
             }),
             addVisitor: builder.mutation({

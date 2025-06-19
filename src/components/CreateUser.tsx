@@ -73,10 +73,7 @@ const CreateUser = () => {
                                         {...formik.getFieldProps("first_name")}
                                         type="text"
                                         placeholder="Enter first name"
-                                        className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${formik.touched.first_name && formik.errors.first_name
-                                            ? "border-red-300 bg-red-50"
-                                            : "border-gray-300 hover:border-gray-400"
-                                            }`}
+                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 "
                                     />
                                     {formik.touched.first_name && formik.errors.first_name && (
                                         <p className="text-red-500 text-xs sm:text-sm mt-1 flex items-center">
@@ -95,10 +92,7 @@ const CreateUser = () => {
                                         {...formik.getFieldProps("last_name")}
                                         type="text"
                                         placeholder="Enter last name"
-                                        className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${formik.touched.last_name && formik.errors.last_name
-                                            ? "border-red-300 bg-red-50"
-                                            : "border-gray-300 hover:border-gray-400"
-                                            }`}
+                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                     />
                                     {formik.touched.last_name && formik.errors.last_name && (
                                         <p className="text-red-500 text-xs sm:text-sm mt-1 flex items-center">
@@ -119,10 +113,7 @@ const CreateUser = () => {
                                     {...formik.getFieldProps("email")}
                                     type="email"
                                     placeholder="example@company.com"
-                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${formik.touched.email && formik.errors.email
-                                        ? "border-red-300 bg-red-50"
-                                        : "border-gray-300 hover:border-gray-400"
-                                        }`}
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                 />
                                 {formik.touched.email && formik.errors.email && (
                                     <p className="text-red-500 text-xs sm:text-sm mt-1 flex items-center">
@@ -143,10 +134,7 @@ const CreateUser = () => {
                                         {...formik.getFieldProps("contact")}
                                         type="tel"
                                         placeholder="1234567890"
-                                        className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${formik.touched.contact && formik.errors.contact
-                                            ? "border-red-300 bg-red-50"
-                                            : "border-gray-300 hover:border-gray-400"
-                                            }`}
+                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                     />
                                     {formik.touched.contact && formik.errors.contact && (
                                         <p className="text-red-500 text-xs sm:text-sm mt-1 flex items-center">
@@ -165,10 +153,7 @@ const CreateUser = () => {
                                 </label>
                                 <select
                                     {...formik.getFieldProps("role")}
-                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white ${formik.touched.role && formik.errors.role
-                                        ? "border-red-300 bg-red-50"
-                                        : "border-gray-300 hover:border-gray-400"
-                                        }`}
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
                                 >
                                     <option value="" disabled>
                                         Select Role
@@ -195,10 +180,7 @@ const CreateUser = () => {
                                     {...formik.getFieldProps("password")}
                                     type="password"
                                     placeholder="Enter secure password"
-                                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${formik.touched.password && formik.errors.password
-                                        ? "border-red-300 bg-red-50"
-                                        : "border-gray-300 hover:border-gray-400"
-                                        }`}
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                 />
                                 {formik.touched.password && formik.errors.password && (
                                     <p className="text-red-500 text-xs sm:text-sm mt-1 flex items-center">

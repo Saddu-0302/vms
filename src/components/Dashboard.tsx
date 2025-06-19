@@ -1,8 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Users, Clock, CheckCircle, XCircle, Search, TrendingUp, Eye, Phone, Building } from "lucide-react"
+import { useState, useEffect, useMemo } from "react"
+import { Users, Clock, CheckCircle, XCircle, Search, TrendingUp, Eye, Phone, Building, Shield, UserCheck, ShieldCheck } from "lucide-react"
 import MenuList from "./MenuList"
+import { useGetAllVisitorsQuery } from "../redux/visitorApi"
+import { array } from "yup"
 
 interface Visitor {
     _id: string
@@ -18,71 +20,7 @@ interface Visitor {
     visitDate: string
 }
 
-// Mock data for demonstration
-const mockVisitors: Visitor[] = [
-    {
-        _id: "1",
-        name: "John Smith",
-        email: "john.smith@example.com",
-        phone: "+1234567890",
-        company: "Tech Corp",
-        purpose: "Business Meeting",
-        host: "Alice Johnson",
-        checkIn: "09:30 AM",
-        checkOut: "11:45 AM",
-        status: "approved",
-        visitDate: "2025-06-16",
-    },
-    {
-        _id: "2",
-        name: "Sarah Wilson",
-        email: "sarah.wilson@example.com",
-        phone: "+1234567891",
-        company: "Design Studio",
-        purpose: "Project Discussion",
-        host: "Bob Miller",
-        checkIn: "10:15 AM",
-        status: "pending",
-        visitDate: "2025-06-16",
-    },
-    {
-        _id: "3",
-        name: "Mike Davis",
-        email: "mike.davis@example.com",
-        phone: "+1234567892",
-        company: "Marketing Inc",
-        purpose: "Consultation",
-        host: "Carol Brown",
-        checkIn: "02:00 PM",
-        checkOut: "03:30 PM",
-        status: "approved",
-        visitDate: "2025-06-16",
-    },
-    {
-        _id: "4",
-        name: "Emma Thompson",
-        email: "emma.thompson@example.com",
-        phone: "+1234567893",
-        company: "Finance Ltd",
-        purpose: "Interview",
-        host: "David Wilson",
-        checkIn: "11:00 AM",
-        status: "rejected",
-        visitDate: "2025-06-16",
-    },
-    {
-        _id: "5",
-        name: "James Rodriguez",
-        email: "james.rodriguez@example.com",
-        phone: "+1234567894",
-        company: "Startup Hub",
-        purpose: "Partnership Meeting",
-        host: "Eva Martinez",
-        checkIn: "03:45 PM",
-        status: "pending",
-        visitDate: "2025-06-16",
-    },
-]
+
 
 // Mock chart data
 const chartData = [
@@ -96,73 +34,78 @@ const chartData = [
 ]
 
 const VisitorDashboard = () => {
-    const [searchTerm, setSearchTerm] = useState("")
+    const { data } = useGetAllVisitorsQuery(undefined)
+    const [search, setSearch] = useState<string>("")
     const [filteredVisitors, setFilteredVisitors] = useState<Visitor[]>([])
 
-    // Get today's date in YYYY-MM-DD format
-    const today = new Date().toISOString().split("T")[0]
+    const visitor: Visitor[] = Array.isArray(data) ? data : [];
+    const Approved =
+        data?.filter((approved: any) => approved.status === "Approved") || []
+    const Pending =
+        data?.filter((pending: any) => pending.status === "Pending") || []
 
-    // Filter today's visitors
-    const todaysVisitors = mockVisitors.filter((visitor) => visitor.visitDate === today)
-
-    useEffect(() => {
-        const filtered = todaysVisitors.filter(
-            (visitor) =>
-                visitor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                visitor.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                visitor.purpose.toLowerCase().includes(searchTerm.toLowerCase()),
-        )
-        setFilteredVisitors(filtered)
-    }, [searchTerm])
-
-    // Calculate statistics
-    const allVisitors = todaysVisitors.length
-    const pendingVisitors = todaysVisitors.filter((v) => v.status === "pending").length
-    const approvedVisitors = todaysVisitors.filter((v) => v.status === "approved").length
-    const rejectedVisitors = todaysVisitors.filter((v) => v.status === "rejected").length
-
-    const statsData = [
+    const Rejected = data?.filter((reject: any) => reject.status === "Rejected") || []
+    const visitorData = [
         {
             icon: Users,
-            title: "All Visitors",
-            count: allVisitors,
+            name: "All Visitor",
+            count: data?.length || 0,
             color: "text-blue-600",
             bgColor: "bg-blue-50",
             borderColor: "border-blue-200",
         },
         {
-            icon: Clock,
-            title: "Pending",
-            count: pendingVisitors,
+            icon: Shield,
+            name: "Approved",
+            count: Approved?.length || 0,
+            color: "text-green-600",
+            bgColor: "bg-green-50",
+            borderColor: "border-green-200",
+
+        },
+        {
+            icon: UserCheck,
+            name: "Pending",
+            count: Pending?.length || 0,
             color: "text-yellow-600",
             bgColor: "bg-yellow-50",
             borderColor: "border-yellow-200",
         },
         {
-            icon: CheckCircle,
-            title: "Approved",
-            count: approvedVisitors,
-            color: "text-green-600",
-            bgColor: "bg-green-50",
-            borderColor: "border-green-200",
-        },
-        {
-            icon: XCircle,
-            title: "Rejected",
-            count: rejectedVisitors,
+            icon: ShieldCheck,
+            name: "Rejected",
+            count: Rejected?.length || 0,
             color: "text-red-600",
             bgColor: "bg-red-50",
             borderColor: "border-red-200",
+
         },
     ]
+    const today = new Date().toISOString().split("T")[0]
+    const todaysVisitor = useMemo(() => {
+        return visitor?.filter((visitor: any) => {
+            const visitorDate = new Date(visitor.createdAt).toISOString().split("T")[0];
+            return visitorDate === today
+        })
+    }, [visitor])
 
+    useEffect(() => {
+        const inputSearch = search?.toLowerCase().trim()
+        if (inputSearch) {
+            const filtered = todaysVisitor.filter((v: Visitor) =>
+                v.name.toLowerCase().includes(inputSearch));
+            setFilteredVisitors(filtered)
+        } else {
+            setFilteredVisitors(todaysVisitor)
+        }
+    }, [search, todaysVisitor])
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case "approved":
+            case "Approved":
                 return "bg-green-100 text-green-800 hover:bg-green-200"
-            case "pending":
+            case "Pending":
                 return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-            case "rejected":
+            case "Rejected":
                 return "bg-red-100 text-red-800 hover:bg-red-200"
             default:
                 return "bg-gray-100 text-gray-800 hover:bg-gray-200"
@@ -170,7 +113,6 @@ const VisitorDashboard = () => {
     }
 
     const maxVisitors = Math.max(...chartData.map((d) => d.visitors))
-
     return (
         <div className="min-h-screen bg-gray-50/50">
             {/* Header */}
@@ -182,16 +124,8 @@ const VisitorDashboard = () => {
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="flex items-center text-sm text-gray-600">
-                                {/* <Calendar className="w-4 h-4 mr-2" />
-                                {new Date().toLocaleDateString("en-US", {
-                                    weekday: "long",
-                                    year: "numeric",
-                                    month: "long",
-                                    day: "numeric",
-                                })} */}
-
                                 <label htmlFor="my-drawer" className="btn drawer-button rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" className="bi bi-list" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
+                                    <path d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
                                 </svg></label>
                             </div>
                         </div>
@@ -202,27 +136,29 @@ const VisitorDashboard = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Statistics Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    {statsData.map((stat, index) => {
-                        const IconComponent = stat.icon
-                        return (
-                            <div
-                                key={index}
-                                className={`bg-white rounded-lg border-l-4 ${stat.borderColor} shadow-sm hover:shadow-md transition-shadow duration-200`}
-                            >
-                                <div className="p-6">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                                            <p className="text-3xl font-bold text-gray-900 mt-2">{stat.count}</p>
-                                        </div>
-                                        <div className={`${stat.bgColor} p-3 rounded-full`}>
-                                            <IconComponent className={`w-6 h-6 ${stat.color}`} />
+
+                    {visitorData &&
+                        visitorData.map((visitor: any, index: number) => {
+                            const IconComponent = visitor.icon
+                            return (
+                                <div
+                                    key={index + 1}
+                                    className={`bg-white rounded-lg border-l-4 ${visitor.borderColor} shadow-sm hover:shadow-md transition-shadow duration-200`}
+                                >
+                                    <div className="p-6">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-600">{visitor.name}</p>
+                                                <p className="text-3xl font-bold text-gray-900 mt-2">{visitor.count}</p>
+                                            </div>
+                                            <div className={`${visitor.bgColor} p-3 rounded-full`}>
+                                                <IconComponent className={`w-6 h-6 ${visitor.color}`} />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        )
-                    })}
+                            )
+                        })}
                 </div>
 
                 {/* Chart Section */}
@@ -287,13 +223,14 @@ const VisitorDashboard = () => {
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                 <Eye className="w-5 h-5" />
-                                Today's Visitors ({filteredVisitors.length})
+                                Today's Visitors
+                                {/* ({filteredVisitors.length}) */}
                             </h2>
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                                 <input
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
                                     className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64 text-sm"
                                     placeholder="Search visitors..."
                                 />
@@ -310,9 +247,7 @@ const VisitorDashboard = () => {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Visitor
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Company
-                                        </th>
+
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Purpose
                                         </th>
@@ -342,10 +277,9 @@ const VisitorDashboard = () => {
                                                     <div className="text-sm text-gray-500">{visitor.email}</div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{visitor.company}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{visitor.purpose}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{visitor.host}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{visitor.checkIn}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{new Date(visitor.createdAt).toLocaleTimeString()}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{visitor.checkOut || "-"}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span
@@ -356,7 +290,7 @@ const VisitorDashboard = () => {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <div className="flex justify-end gap-2">
-                                                    {visitor.status === "pending" && (
+                                                    {visitor.status === "Pending" && (
                                                         <>
                                                             <button className="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-150">
                                                                 Approve
@@ -366,9 +300,6 @@ const VisitorDashboard = () => {
                                                             </button>
                                                         </>
                                                     )}
-                                                    <button className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-150">
-                                                        View
-                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -393,14 +324,9 @@ const VisitorDashboard = () => {
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-sm">
                                         <div className="flex items-center text-gray-600">
-                                            <Building className="w-4 h-4 mr-2 text-gray-400" />
-                                            <span className="font-medium">Company:</span>
-                                            <span className="ml-1">{visitor.company}</span>
-                                        </div>
-                                        <div className="flex items-center text-gray-600">
                                             <Phone className="w-4 h-4 mr-2 text-gray-400" />
                                             <span className="font-medium">Phone:</span>
-                                            <span className="ml-1">{visitor.phone}</span>
+                                            <span className="ml-1">{visitor.contact}</span>
                                         </div>
                                         <div className="flex items-center text-gray-600">
                                             <span className="font-medium">Purpose:</span>
@@ -412,7 +338,7 @@ const VisitorDashboard = () => {
                                         </div>
                                         <div className="flex items-center text-gray-600">
                                             <span className="font-medium">Check In:</span>
-                                            <span className="ml-1">{visitor.checkIn}</span>
+                                            <span className="ml-1">{new Date(visitor.createdAt).toLocaleTimeString()}</span>
                                         </div>
                                         <div className="flex items-center text-gray-600">
                                             <span className="font-medium">Check Out:</span>
@@ -447,7 +373,10 @@ const VisitorDashboard = () => {
                                 <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                 <h3 className="text-lg font-medium text-gray-900 mb-2">No visitors found</h3>
                                 <p className="text-gray-500">
-                                    {searchTerm ? "Try adjusting your search criteria." : "No visitors scheduled for today."}
+                                    {/* {
+                                        // searchTerm ?
+                                        "Try adjusting your search criteria." 
+                                        : "No visitors scheduled for today."} */}
                                 </p>
                             </div>
                         )}
@@ -464,6 +393,7 @@ const VisitorDashboard = () => {
                     </ul>
                 </div>
             </div>
+
         </div>
     )
 }
